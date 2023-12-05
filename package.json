@@ -1,0 +1,17 @@
+{
+  "name": "gulpetl-node-red-core",
+  "version": "0.1.0",
+  "description": "Core nodes for using gulp/gulpetl under Node.RED",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "peterl@sbcotton.com",
+  "license": "MIT",
+  "node-red": {
+    "nodes": {
+      "gulp.src": "gulp_src.js"
+    }
+  }
+}
