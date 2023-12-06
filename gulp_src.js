@@ -1,5 +1,4 @@
 const gulp = require('gulp');
-const combine = require('stream-combiner')
 
 module.exports = function (RED) {
     function GulpSrcNode(config) {
@@ -7,58 +6,55 @@ module.exports = function (RED) {
         this.path = config.path;
 
         let node = this;
+console.log("config", config)
 
-        // get/create new "streams" property in the flow context; it's an object where each property is name with a _msg_id and will be
-        // an array of streams for the corresponding msg
-        let nodeStreams = node.context().flow.get("streams");
-        if (!nodeStreams)
-            node.context().flow.set("streams", nodeStreams = {}); // get/initialize this node's streams object
-
-        node.on('input', function (msg, send, done) {
-            config = { buffer: false, ...msg.config } // default to streaming mode
-            // console.log("config", config)
-
-            nodeStreams[msg._msgid] = []; // create an empty streams array for this message
+        node.on('input', function (msg, send) {
+            let configObj = { buffer: false, ...msg.config } // default to streaming mode
+            msg.plugins = [];
 
             // set the payload to give info on the gulp stream we're creating
             msg.payload = "gulp.src: " + node.path;
             msg.topic = "gulp-initialize";
 
-            setTimeout(() => {
-                console.log(`gulp.src: creating gulp stream for ${msg._msgid}; combining ${this.context().flow.get("streams")[msg._msgid]?.length} plugin streams`)
-                /* */
+console.log("START");
 
-                msg.gulpstream = gulp.src(node.path, config)
-                    .on("data", (file) => {
-                        this.status({ fill: "green", shape: "dot", text: "active" });
-                        // console.log("DATA");
+            msg.plugins.push({
+                name: config.type,
+                // init:() => gulp.src(node.path, configObj)
+                init: () => {
+                    return gulp.src(node.path, configObj)
+                        .on("data", (file) => {
+                            this.status({ fill: "green", shape: "dot", text: "active" });
+                            // console.log("DATA");
 
-                        // send an info message to announce the file we're processing
-                        msg.payload = "gulpfile: " + file.inspect();
-                        msg.topic = "gulp-info";
-                        msg.gulpfile = file;
-                        send(msg);
-                        // console.log("gulp.src:", file)
+                            // new msg for each file; otherwise we just change the same one and they'll all look the same in the debug pain
+                            let newMsg = RED.util.cloneMessage(msg);
 
-                        // let fileName = file.stem;
-                        // file.contents.on("data", (data) => {
-                        //     console.log("test:" + fileName + ":", data.toString().trim())
-                        // })
-                    })
-                    .on("end", (file => {
-                        this.status({ fill: "green", shape: "ring", text: "ready" });
-                        // console.log("END")
-                        // TODO: when all files have ended, remove nodeStreams[msg._msgid] to allow garbage collection
-                    }))
-                    .pipe(combine(this.context().flow.get("streams")[msg._msgid]))
+                            // send an info message to announce the file we're processing
+                            newMsg.payload = "gulpfile: " + file.inspect();
+                            newMsg.topic = "gulp-info";
+                            newMsg.gulpfile = file;
+// send(msg);
+                            send(newMsg);
+                            console.log("gulp.src:", file)
 
-                done(); // OK to run this here?
-
-            }, 2000);
+                            // let fileName = file.stem;
+                            // file.contents.on("data", (data) => {
+                            //     console.log("test:" + fileName + ":", data.toString().trim())
+                            // })
+                        })
+                        .on("end", () => {
+                            this.status({ fill: "green", shape: "ring", text: "ready" });
+                            // console.log("END")
+                        })
+                }
+            })
 
             send(msg);
-
+            console.log('sendMsg')
         });
+
+
     }
     RED.nodes.registerType("gulp.src", GulpSrcNode);
 }

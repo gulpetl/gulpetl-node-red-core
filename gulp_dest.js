@@ -1,4 +1,5 @@
 const gulp = require('gulp');
+const combine = require('stream-combiner')
 
 module.exports = function(RED) {
     function GulpDestNode(config) {
@@ -6,6 +7,9 @@ module.exports = function(RED) {
         this.path = config.path;
         var node = this;
         node.on('input', function(msg) {
+            // msg.debug = {};
+            // msg.debug.config = config;
+            // msg.debug.node = node;
 
             if (!msg.topic?.startsWith("gulp-")) {
                 this.status({fill:"red",shape:"dot",text:"missing .src node"});
@@ -14,12 +18,15 @@ module.exports = function(RED) {
                 // ignore this informational message
             }
             else if (msg.topic == "gulp-initialize") {
-                if (!node.context().flow.get("streams") || !node.context().flow.get("streams")[msg._msgid]) {
+                if (!msg.plugins) {
                     node.warn(`gulp.dest: cannot initialize; missing gulp.src?`)
                     return;
                 }
 
-                node.context().flow.get("streams")[msg._msgid]?.push(gulp.dest(node.path));
+                console.log(`gulp.dest: creating gulp stream; combining ${msg.plugins.length} plugin streams`)
+                combine(msg.plugins.map((plugin) => plugin.init()))
+                    .pipe(gulp.dest(node.path));
+
                 this.status({fill:"green",shape:"ring",text:"ready"});
             }
 

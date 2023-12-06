@@ -11,12 +11,15 @@
   "license": "MIT",
   "node-red": {
     "nodes": {
-      "gulp.src": "gulp_src.js",      
+      "gulp.src": "gulp_src.js",
       "gulp.dest": "gulp_dest.js"
     }
   },
   "dependencies": {
     "gulp": "^4.0.2",
     "stream-combiner": "^0.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.55.0"
   }
 }
