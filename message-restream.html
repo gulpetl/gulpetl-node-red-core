@@ -1,0 +1,36 @@
+<script type="text/javascript">
+    RED.nodes.registerType('msg-restream',{
+        category: 'gulpetl',           
+        // color: '#3386BB',
+        // color: '#a6bbcf',
+        // color: "#FB58B3",
+        // color: "#FF89C5",
+        // color: "#FA89C2",
+        color: "#9E3131",
+        defaults: {
+            name: {value:""},
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-bars",
+        label: function() {
+            return this.name||"gelpetl-msg-restream";
+        },
+        paletteLabel: function() {
+            // use small non-breaking dash character for visual presentation-- avoids the breaks node-red inserts around regular dashes in the palette - https://www.compart.com/en/unicode/category/Pd
+            return "msg-restream".replace("-","\u2011");
+        },
+        align:"right"
+    });
+</script>
+
+<script type="text/html" data-template-name="msg-restream">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="msg-restream">
+    <p>A simple node that converts the message payloads into all lower-case characters</p>
+</script>

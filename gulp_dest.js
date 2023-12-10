@@ -1,21 +1,20 @@
 const gulp = require('gulp');
 const combine = require('stream-combiner')
 
-module.exports = function(RED) {
+module.exports = function (RED) {
     function GulpDestNode(config) {
-        RED.nodes.createNode(this,config);        
+        RED.nodes.createNode(this, config);
         this.path = config.path;
         var node = this;
-        node.on('input', function(msg, send) {
+        node.on('input', function (msg, send) {
             // msg.debug = {};
             // msg.debug.config = config;
             // msg.debug.node = node;
-
-            if (!msg.topic?.startsWith("gulp-")) {
-                this.status({fill:"red",shape:"dot",text:"missing .src node"});
+            if (!msg.topic?.startsWith("gulp-") && !msg.topic?.startsWith("gulpetl-")) {
+                this.status({ fill: "red", shape: "dot", text: "missing .src node" });
             }
             else if (msg.topic == "gulp-info") {
-                // ignore this informational message
+                // ignore this informational message--but pass it along below
             }
             else if (msg.topic == "gulp-initialize") {
                 if (!msg.plugins) {
@@ -26,33 +25,32 @@ module.exports = function(RED) {
                 console.log(`gulp.dest: creating gulp stream; combining ${msg.plugins.length} plugin streams`)
                 combine(msg.plugins.map((plugin) => plugin.init()))
                     .pipe(gulp.dest(node.path)
-                    .on("data", (file) => {
-                        this.status({ fill: "green", shape: "dot", text: "active" });
-                        // console.log("DATA");
+                        .on("data", (file) => {
+                            this.status({ fill: "green", shape: "dot", text: "active" });
 
-                        // new msg for each file; otherwise we just change the same one and they'll all look the same in the debug pain
-                        let newMsg = msg;//RED.util.cloneMessage(msg);
+                            // send an info message to announce the file we're processing
+                            // let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ${file?.inspect()}`
+                            // let fileDescription = `${file.history[0].split(/[\\/]/).pop()}`
+                            let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ` + '' + file;
+                            msg.payload = `gulpfile: ${fileDescription}`;
+                            msg.topic = "gulp-info";
+                            msg.gulpfile = file;
+                            console.log("gulp.dest:", fileDescription)
 
-                        // send an info message to announce the file we're processing
-                        newMsg.payload = "gulpfile: " + file.inspect();
-                        newMsg.topic = "gulp-info";
-                        newMsg.gulpfile = file;
-// send(msg);
-                        send(newMsg);
-                        console.log("gulp.src:", file)
+                            send(msg);
 
-                        // let fileName = file.stem;
-                        // file.contents.on("data", (data) => {
-                        //     console.log("test:" + fileName + ":", data.toString().trim())
-                        // })
-                    })
+                            let fileName = file.stem;
+                            file.contents.on("data", (data) => {
+                                console.log("test:" + fileName + ":", data.toString().trim())
+                            })
+                        })
                     );
 
-                this.status({fill:"green",shape:"ring",text:"ready"});
+                this.status({ fill: "green", shape: "ring", text: "ready" });
             }
 
             node.send(msg);
         });
     }
-    RED.nodes.registerType("gulp.dest",GulpDestNode);
+    RED.nodes.registerType("gulp.dest", GulpDestNode);
 }
