@@ -64,7 +64,7 @@ module.exports = function (RED) {
                                 msg.payload = JSON.parse(data);
                                 msg.topic = "gulpetl-message";
 
-                                node.send(msg);
+                                send(msg);
                             })
                                 .on("end", () => {
                                     console.log("END")
@@ -72,7 +72,7 @@ module.exports = function (RED) {
                                     msg.payload = "";//JSON.parse(data);
                                     msg.topic = "gulpetl-end";
     
-                                    node.send(msg);
+                                    send(msg);
                                     })
 
                         })
