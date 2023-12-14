@@ -41,6 +41,55 @@ module.exports = function (RED) {
                     //     })
                     // })
 
+
+                
+                // msg.plugins = [];
+                msg.plugins.push({
+                    name: config.type, init: () => {
+
+                        let filetransform = transform((file) => {
+                            let linetransform = transform((line) => {
+                                // change line here
+                                console.log(`msg.pipe (line): ${line}`)
+                                
+                                msg = RED.util.cloneMessage(msg);
+                                msg.payload = JSON.parse(line);
+                                msg.gulpfile = file;
+                                msg.topic = "gulpetl-message";
+
+                                send(msg);
+
+                                // return line;
+                                return null; // DON'T return this line
+                            });
+    
+                            
+                            file.contents = file.contents
+                                .pipe(linetransform)
+                                .on("end", () => {
+                                    console.log("END ", file.stem)
+                                    msg = RED.util.cloneMessage(msg);
+                                    msg.payload = "";//JSON.parse(data);
+                                    msg.gulpfile = file;
+                                    msg.topic = "gulpetl-end";
+    
+                                    send(msg);
+                                })
+                            
+                            return file;
+                        });
+
+    
+                        // this.context().set("appender", appender);  // set appender on node context
+                        // console.log("msg.restream: set appender")
+    
+                        // this.context().set("gulpstream", gulpStream);  // set appender on node context
+                        return filetransform;
+                    }
+                });
+
+
+/*
                     console.log(`msg-pipe: creating gulp stream; combining ${msg.plugins.length} plugin streams`)
                     combine(msg.plugins.map((plugin) => plugin.init()))
                         .on("data", (file) => {
@@ -99,10 +148,10 @@ module.exports = function (RED) {
 
                         //     return newFile;
                         // }))
-
+*/
                 }
 
-                node.send(msg);
+                send(msg);
             }
         })
 

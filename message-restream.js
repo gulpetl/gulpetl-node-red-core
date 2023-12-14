@@ -19,46 +19,84 @@ module.exports = function (RED) {
                 // set the payload to give info on the gulp stream we're creating
                 // msg.payload = "msg-restream: " + node.path;
                 msg.topic = "gulp-initialize";
-    
+
                 console.log("message-restream:initialize")
-                
-                msg.plugins = [];
+
+                // msg.plugins = [];
+                // msg.plugins.push({
+                //     name: config.type, init: () => {
+                //         let gulpStream
+                //         // if no previous plugins, it's up to us to kick off the gulpstream
+                //         // if (!msg.plugins || msg.plugins.length == 0) {
+
+                //         let appender = transform((line) => {
+                //             // change line here
+                //             return line;
+                //         });
+
+                //         let gulpfile = new Vinyl({
+                //             //   base: path.dirname(pretendFilePath),    
+                //             //   path:pretendFilePath,
+                //             base: ".",
+                //             path: "carzz.ndjson",
+                //             contents: appender,
+                //             appender: appender
+                //         });
+
+
+                //         // gulpStream = from2.obj() // not sure if it's possible to start a gulp stream without a vinyl file. We won't try.
+                //         gulpStream = from2.obj([gulpfile])
+                //             .on("data", (file) => {
+                //                 let fileName = file.stem;
+                //                 file.contents.on("data", (data) => {
+                //                     console.log("test:" + fileName + ":", data.toString().trim())
+                //                 })
+                //             })
+                //         // }
+
+                //         this.context().set("appender", appender);  // set appender on node context
+                //         console.log("msg.restream: set appender")
+
+                //         this.context().set("gulpstream", gulpStream);  // set appender on node context
+                //         return gulpStream;
+                //     }
+                // });
+
                 msg.plugins.push({
                     name: config.type, init: () => {
-                        let gulpStream
-                        // if no previous plugins, it's up to us to kick off the gulpstream
-                        // if (!msg.plugins || msg.plugins.length == 0) {
+
+                        let filetransform = transform((file) => {
+                            let lineAppender = transform((line) => {
+                                // change line here
+                                // console.log(`msg.restream (appender): ${line}`)
     
-                        let appender = transform((line) => {
-                            // change line here
-                            return line;
+                                return line;
+                                // return null; // DON'T return this line
+                            });
+    
+
+                            // change file here
+
+                            file.contents = mergeStream(lineAppender, file.contents);
+                            // file.contents = lineAppender;
+
+                            file.appender = lineAppender;
+
+                            // this was just for testing, but causes odd behavior on (completely breaks) second file in pipeline; 
+                            // I guess I don't understand on.data well enough to use it without unintended side effects
+                            // file?.contents?.on("data", (data) => {
+                            //     console.log(`mergeStream on ${file.stem}:` + data.toString().trim())
+                            // })
+                            return file;
                         });
-    
-                        let gulpfile = new Vinyl({
-                            //   base: path.dirname(pretendFilePath),    
-                            //   path:pretendFilePath,
-                            base: ".",
-                            path: "carzz.ndjson",
-                            contents: appender,
-                            appender: appender
-                        });
-    
-    
-                        // gulpStream = from2.obj() // not sure if it's possible to start a gulp stream without a vinyl file. We won't try.
-                        gulpStream = from2.obj([gulpfile])
-                            .on("data", (file) => {
-                                let fileName = file.stem;
-                                file.contents.on("data", (data) => {
-                                    console.log("test:" + fileName + ":", data.toString().trim())
-                                })
-                            })
-                        // }
-    
-                        this.context().set("appender", appender);  // set appender on node context
-                        console.log("msg.restream: set appender")
-    
-                        this.context().set("gulpstream", gulpStream);  // set appender on node context
-                        return gulpStream;
+
+                 
+
+                        // this.context().set("appender", appender);  // set appender on node context
+                        // console.log("msg.restream: set appender")
+
+                        // this.context().set("gulpstream", gulpStream);  // set appender on node context
+                        return filetransform;
                     }
                 });
 
@@ -76,16 +114,15 @@ module.exports = function (RED) {
 
             if (msg.topic == "gulp-initialize") {
                 // nothing to initialize here; we'll just pass this message along
-                
+
                 // no, go ahead and try to initilize 
-                try{
+                try {
                     prepInitializeMsg(msg);
                 }
-                catch(err) 
-                {
+                catch (err) {
                     console.error(err);
                 }
-                
+
             }
             else if (msg.topic == "gulpetl-message") {
                 // let gulpStream = this.context().get("gulpstream");  // get gulpstream from  node context
@@ -119,30 +156,31 @@ module.exports = function (RED) {
 
 
                 let appender = msg.gulpfile?.appender;
-                if (!appender)
-                    appender = this.context().get("appender"); // get appender from node context
+                // if (!appender)
+                //     appender = this.context().get("appender"); // get appender from node context
 
                 // this doesn't work; no way to delay current message enough for new initialize message to complete...
                 // if (!appender){
                 //     send(prepInitializeMsg(RED.util.cloneMessage(msg)));
-                    
+
                 //     appender = this.context().get("appender"); // get appender from node context
                 // }
 
                 if (appender) {
                     this.context().set("appender", appender);  // set appender on node context
 
-                    console.log("msg.restream:write to appender:", JSON.stringify(msg.payload))
-                    appender.write(JSON.stringify(msg.payload) + "\n");    
+                    console.log(`msg.restream:write to ${msg.gulpfile.stem}.appender:`, JSON.stringify(msg.payload))
+                    appender.write(JSON.stringify(msg.payload) + "\n");
                 }
             }
             else if (msg.topic == "gulpetl-end") {
                 let appender = msg?.gulpfile?.appender;
-                (!appender)
-                    appender = this.context().get("appender"); // get appender from node context
+                // if (!appender)
+                // appender = this.context().get("appender"); // get appender from node context
                 appender.end();
+                console.log(`msg.restream: ${msg.gulpfile.stem}.appender.end()`)
 
-                
+
                 // let gulpStream = this.context().get("gulpstream");  // get gulpstream from  node context
                 // if (gulpStream)
                 //     gulpStream.end();
