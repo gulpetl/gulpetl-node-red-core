@@ -1,5 +1,5 @@
 {
-  "name": "gulpetl-node-red-core",
+  "name": "@gulpetl/node-red-core",
   "version": "0.1.0",
   "description": "Core nodes for using gulp/gulpetl under Node.RED",
   "main": "index.js",
@@ -18,12 +18,9 @@
     }
   },
   "dependencies": {
-    "from2": "^2.3.0",
     "gulp": "^4.0.2",
     "stream-combiner": "^0.2.2",
-    "stream-transform": "^3.2.10",
-    "vinyl": "^3.0.0",
-    "vinyl-source-stream": "^2.0.0"
+    "stream-transform": "^3.2.10"
   },
   "devDependencies": {
     "eslint": "^8.55.0"

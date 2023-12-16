@@ -7,10 +7,7 @@ module.exports = function (RED) {
         this.path = config.path;
         var node = this;
         node.on('input', function (msg, send) {
-            // msg.debug = {};
-            // msg.debug.config = config;
-            // msg.debug.node = node;
-            if (!msg.topic?.startsWith("gulp-") && !msg.topic?.startsWith("gulpetl-")) {
+            if (!msg.topic?.startsWith("gulp")) {
                 this.status({ fill: "red", shape: "dot", text: "missing .src node" });
             }
             else if (msg.topic == "gulp-info") {
@@ -29,27 +26,24 @@ module.exports = function (RED) {
                             this.status({ fill: "green", shape: "dot", text: "active" });
 
                             // send an info message to announce the file we're processing
-                            // let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ${file?.inspect()}`
-                            // let fileDescription = `${file.history[0].split(/[\\/]/).pop()}`
-                            let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ` + '' + file;
+                            let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ${file?.inspect()}`
                             msg.payload = `gulpfile: ${fileDescription}`;
                             msg.topic = "gulp-info";
                             msg.gulpfile = file;
-                            console.log("gulp.dest:", fileDescription)
+                            // console.log("gulp.dest:", fileDescription)
 
                             send(msg);
-
-                            let fileName = file.stem;
-                            file.contents.on("data", (data) => {
-                                console.log("test:" + fileName + ":", data.toString().trim())
-                            })
                         })
+                        .on("end", () => {
+                            this.status({ fill: "green", shape: "ring", text: "ready" });
+                        })
+
                     );
 
                 this.status({ fill: "green", shape: "ring", text: "ready" });
             }
 
-            node.send(msg);
+            send(msg);
         });
     }
     RED.nodes.registerType("gulp.dest", GulpDestNode);
