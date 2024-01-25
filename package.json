@@ -26,6 +26,7 @@
       "message-restream": "message-restream.js"
     }
   },
+  "homepage": "https://gulpetl.com",
   "dependencies": {
     "gulp": "^4.0.2",
     "stream-combiner": "^0.2.2",

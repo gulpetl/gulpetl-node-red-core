@@ -9,7 +9,7 @@ module.exports = function (RED) {
         node.on('input', function (msg, send) {
             const prepInitializeMsg = (msg) => {
                 msg.topic = "gulp-initialize";
-
+                
                 msg.plugins.push({
                     name: config.type, init: () => {
 
@@ -51,6 +51,17 @@ module.exports = function (RED) {
                     
                     // write the gulpetl-message BACK into the gulpfile's stream
                     appender.write(JSON.stringify(msg.payload) + "\n");
+
+                    if (this.context().flow.msgCount % 100 == 0)
+                        console.log("msgCount: " + this.context().flow.msgCount)
+                    this.context().flow.msgCount--;
+
+                    if (this.context().flow.msgCount == 0) {
+                        msg.gulpfile?.upstream.resume();
+                        console.log("restream: resume--msgCount: ", this.context().flow.msgCount);
+                    }
+                    // else 
+                    //     console.log("restream: msgCount: ", this.context().flow.msgCount);
                 }
             }
             else if (msg.topic == "gulpfile-end") {

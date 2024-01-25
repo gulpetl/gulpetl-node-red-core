@@ -29,10 +29,30 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+
+    <div class="form-row">
+        <label for="node-input-action"><i class="fa fa-shower"></i> <span>Pipe Level</span></label>
+        <select id="node-input-action" style="width:70%;">
+            <option value="file">Gulp Stream (msg.payload: file)</option>
+            <option value="line">Message Stream (msg.payload: line)</option>
+        </select>
+    </div>
 </script>
 
 <script type="text/html" data-help-name="msg-pipe">
-    <p>Pipe out messages from inside a gulp-etl Message Stream into Node-RED messages; should be followed eventually
-        by a msg-restream to pipe them back into the Message Stream
+    <p>Pipe out messages from inside a Gulp Stream into Node-RED messages; should be followed eventually
+        by a msg-restream to pipe them back in.
     </p>
+    <h3>Settings</h3>
+    <dl class="message-properties">
+        <dt>Pipe Level
+        </dt>
+        <dd>Gulp Streams have multiple levels; they are "streams within a stream". You must choose the 
+            level of the stream to pipe out of.</dd>
+    </dl>
+    <p>The outermost level contains file objects; piping out of this <code>Gulp Stream</code> level will 
+    generate a Node-RED message for each file.</p>
+
+    <p>The innermost level is inside each file; piping out of this <code>Message Stream</code> level 
+    will generate a Node-RED message for each Message Stream line.</p>
 </script>
