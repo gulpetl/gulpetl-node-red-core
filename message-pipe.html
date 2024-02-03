@@ -1,6 +1,6 @@
 <script type="text/javascript">
-    RED.nodes.registerType('msg-pipe',{
-        category: 'gulpetl',           
+    RED.nodes.registerType('msg-pipe', {
+        category: 'gulpetl',
         // color: '#3386BB',
         // color: '#a6bbcf',
         // color: "#FB58B3",
@@ -8,18 +8,20 @@
         // color: "#FA89C2",
         color: "#9E3131",
         defaults: {
-            name: {value:""},
+            name: { value: "" },
+            limit: { value: "99" },
+            level: { value: "file" },
         },
         inputs: 1,
         outputs: 1,
         // icon: "font-awesome/fa-file-text",
         icon: "font-awesome/fa-bars",
-        label: function() {
-            return this.name||"gelpetl-msg-pipe";
+        label: function () {
+            return this.name || "gelpetl-msg-pipe";
         },
-        paletteLabel: function() {
+        paletteLabel: function () {
             // use small non-breaking dash character for visual presentation-- avoids the breaks node-red inserts around regular dashes in the palette - https://www.compart.com/en/unicode/category/Pd
-            return "msg-pipe".replace("-","\u2011"); 
+            return "msg-pipe".replace("-", "\u2011");
         },
     });
 </script>
@@ -31,11 +33,16 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-action"><i class="fa fa-shower"></i> <span>Pipe Level</span></label>
-        <select id="node-input-action" style="width:70%;">
-            <option value="file">Gulp Stream (msg.payload: file)</option>
-            <option value="line">Message Stream (msg.payload: line)</option>
+        <label for="node-input-level"><i class="fa fa-shower"></i> <span>Pipe Level</span></label>
+        <select id="node-input-level" style="width:70%;">
+            <option value="file">Gulp Stream (msg per file)</option>
+            <option value="line">Message Stream (msg per line)</option>
         </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-limit"><i class="fa fa-pause-circle"></i> Message Backlog Limit</label>
+        <input type="text" id="node-input-limit" placeholder="e.g. 99">
     </div>
 </script>
 
@@ -55,4 +62,19 @@
 
     <p>The innermost level is inside each file; piping out of this <code>Message Stream</code> level 
     will generate a Node-RED message for each Message Stream line.</p>
+
+    <p>Warning: Using <code>Message Stream</code> mode causes a performance hit; use with care.</p>
+    
+    <dl class="message-properties">
+        <dt>Message Backlog Limit
+        </dt>
+        <dd>Creating a Node-RED Message for each line of a large file can quickly overwhelm Node-RED's message 
+            system, leading to slowdowns, heap overflows and crashes. This setting defines a maximum backlog
+            (e.g. 99 means 99 msg's waiting to be handled by Node-RED) which will pause the incoming stream 
+            when that maximum is hit and then restart when the backlog is clear.</dd>
+    </dl>
+    <p>This setting is currently only respected for <code>Message Stream</code> (msg per line).</p>
+    <p>Note: even with a backlog limit, Node-RED's message system can overwhelm Node's garbage collection
+        when dealing with large data files, leading to slowdowns.
+    </p>
 </script>

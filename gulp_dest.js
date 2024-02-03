@@ -26,7 +26,7 @@ module.exports = function (RED) {
                             this.status({ fill: "green", shape: "dot", text: "active" });
 
                             // send an info message to announce the file we're processing
-                            let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ${file?.inspect()}`
+                            let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ${file.basename}`
                             msg.payload = `gulpfile: ${fileDescription}`;
                             msg.topic = "gulp-info";
                             msg.gulpfile = file;
