@@ -8,6 +8,9 @@ dependencies:
   gulp:
     specifier: ^4.0.2
     version: 4.0.2
+  merge:
+    specifier: ^2.1.1
+    version: 2.1.1
   stream-combiner:
     specifier: ^0.2.2
     version: 0.2.2
@@ -1678,6 +1681,10 @@ packages:
       stack-trace: 0.0.10
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /merge@2.1.1:
+    resolution: {integrity: sha512-jz+Cfrg9GWOZbQAnDQ4hlVnQky+341Yk5ru8bZSe6sIDTCIg8n9i/u7hSQGSVOF3C7lH6mGtqjkiT9G4wFLL0w==}
     dev: false
 
   /micromatch@3.1.10:

@@ -1,15 +1,29 @@
 const gulp = require('gulp');
 
+const localDefaultConfigObj = {buffer: false}; // default to streaming mode
+const extractConfig = require('./extract-config.js')
+
 module.exports = function (RED) {
     function GulpSrcNode(config) {
         RED.nodes.createNode(this, config);
-        this.path = config.path;
+        this.path = config.path;        
+        this.config = config.config;
 
         let node = this;
         // console.log("config", config)
 
-        node.on('input', function (msg, send) {
-            let configObj = { buffer: false, ...msg.config } // default to streaming mode
+        node.on('input', function (msg, send, done) {
+            let configObj;
+            try{
+                configObj = JSON.parse(this.config);
+            }
+            catch(err) {
+                done("Unable to parse gulp.src.config: " + err);
+                return;
+            }    
+
+            configObj = extractConfig(configObj, msg?.config, localDefaultConfigObj);
+
             // msg = RED.util.cloneMessage(msg);
 
             /** 

@@ -1,12 +1,28 @@
 const gulp = require('gulp');
 const combine = require('stream-combiner')
 
+const localDefaultConfigObj = {}; // no defaults to override
+const extractConfig = require('./extract-config.js')
+
 module.exports = function (RED) {
     function GulpDestNode(config) {
         RED.nodes.createNode(this, config);
-        this.path = config.path;
+        this.path = config.path;          
+        this.config = config.config;
+
         var node = this;
-        node.on('input', function (msg, send) {
+        node.on('input', function (msg, send, done) {
+            let configObj;
+            try{
+                configObj = JSON.parse(this.config);
+            }
+            catch(err) {
+                done("Unable to parse gulp.dest.config: " + err);
+                return;
+            }    
+
+            configObj = extractConfig(configObj, msg?.config, localDefaultConfigObj);
+
             if (!msg.topic?.startsWith("gulp")) {
                 this.status({ fill: "red", shape: "dot", text: "missing .src node" });
             }
@@ -21,7 +37,7 @@ module.exports = function (RED) {
 
                 console.log(`gulp.dest: creating gulp stream; combining ${msg.plugins.length} plugin streams`)
                 combine(msg.plugins.map((plugin) => plugin.init()))
-                    .pipe(gulp.dest(node.path)
+                    .pipe(gulp.dest(node.path, configObj)
                         .on("data", (file) => {
                             this.status({ fill: "green", shape: "dot", text: "active" });
 
