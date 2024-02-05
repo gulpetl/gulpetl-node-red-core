@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 
 const localDefaultConfigObj = {buffer: false}; // default to streaming mode
-const extractConfig = require('./extract-config.js')
+const extractConfig = require('./extract-config.js').extractConfig;
 
 module.exports = function (RED) {
     function GulpSrcNode(config) {

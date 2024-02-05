@@ -4,7 +4,7 @@
   "description": "Core nodes/code for using gulp/gulpetl under Node.RED",
   "main": "extract-config.js",
   "scripts": {
-    "bump": "npm version patch && git push --tags origin master",
+    "bump": "npm version patch && git push --tags origin main",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

@@ -1,5 +1,9 @@
 const merge = require('merge');
 
+//
+// Note: ./extract-config.d.ts must be updated manually upon any changes to exported function signatures below
+//
+
 /**
  * Merges config information for this plugin from all potential sources
  * @param specificConfigObj A configObj set specifically for this plugin
@@ -8,7 +12,7 @@ const merge = require('merge');
  * @param pluginName Name to search in pipelineConfigObj for settings, i.e. pipelineConfigObj[pluginName]
  * @param defaultConfigObj A default configObj whose properties are overridden by the others
  */
-module.exports = function extractConfig(specificConfigObj, pipelineConfigObj, pluginName, defaultConfigObj) {
+module.exports.extractConfig = (specificConfigObj, pipelineConfigObj = {}, pluginName = "", defaultConfigObj = {}) => {
     let configObj;
     try {
       let dataObj;

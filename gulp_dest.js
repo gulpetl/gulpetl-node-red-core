@@ -2,7 +2,7 @@ const gulp = require('gulp');
 const combine = require('stream-combiner')
 
 const localDefaultConfigObj = {}; // no defaults to override
-const extractConfig = require('./extract-config.js')
+const extractConfig = require('./extract-config.js').extractConfig;
 
 module.exports = function (RED) {
     function GulpDestNode(config) {
