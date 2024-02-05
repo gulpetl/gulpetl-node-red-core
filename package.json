@@ -1,8 +1,8 @@
 {
   "name": "@gulpetl/node-red-core",
   "version": "0.0.3",
-  "description": "Core nodes for using gulp/gulpetl under Node.RED",
-  "main": "index.js",
+  "description": "Core nodes/code for using gulp/gulpetl under Node.RED",
+  "main": "extract-config.js",
   "scripts": {
     "bump": "npm version patch && git push --tags origin master",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,8 +17,12 @@
     "node-red"
   ],
   "author": "peterl@sbcotton.com",
+  "engines": {
+    "node": ">=0.10.0"
+  },
   "license": "MIT",
-  "node-red": {
+  "node-red": {    
+    "version": ">=2.0.0",
     "nodes": {
       "gulp.src": "gulp_src.js",
       "gulp.dest": "gulp_dest.js",
@@ -27,6 +31,7 @@
     }
   },
   "homepage": "https://gulpetl.com",
+  "repository": "https://github.com/gulpetl/gulpetl-node-red-core",
   "dependencies": {
     "gulp": "^4.0.2",
     "merge": "^2.1.1",

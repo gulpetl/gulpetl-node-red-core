@@ -21,7 +21,7 @@ module.exports = function (RED) {
                 return;
             }    
 
-            configObj = extractConfig(configObj, msg?.config, localDefaultConfigObj);
+            configObj = extractConfig(configObj, msg?.config, "gulp.dest", localDefaultConfigObj);
 
             if (!msg.topic?.startsWith("gulp")) {
                 this.status({ fill: "red", shape: "dot", text: "missing .src node" });

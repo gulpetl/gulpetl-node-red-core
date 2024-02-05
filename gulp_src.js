@@ -22,7 +22,7 @@ module.exports = function (RED) {
                 return;
             }    
 
-            configObj = extractConfig(configObj, msg?.config, localDefaultConfigObj);
+            configObj = extractConfig(configObj, msg?.config, "gulp.src", localDefaultConfigObj);
 
             // msg = RED.util.cloneMessage(msg);
 
