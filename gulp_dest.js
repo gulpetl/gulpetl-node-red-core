@@ -7,19 +7,20 @@ const extractConfig = require('./extract-config.js').extractConfig;
 module.exports = function (RED) {
     function GulpDestNode(config) {
         RED.nodes.createNode(this, config);
-        this.path = config.path;          
+        this.path = config.path;
         this.config = config.config;
 
         var node = this;
         node.on('input', function (msg, send, done) {
             let configObj;
-            try{
-                configObj = JSON.parse(this.config);
+            try {
+                if (this.config.trim())
+                    configObj = JSON.parse(this.config);
             }
-            catch(err) {
+            catch (err) {
                 done("Unable to parse gulp.dest.config: " + err);
                 return;
-            }    
+            }
 
             configObj = extractConfig(configObj, msg?.config, "gulp.dest", localDefaultConfigObj);
 
