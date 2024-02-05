@@ -12,7 +12,7 @@ const merge = require('merge');
  * @param pluginName Name to search in pipelineConfigObj for settings, i.e. pipelineConfigObj[pluginName]
  * @param defaultConfigObj A default configObj whose properties are overridden by the others
  */
-module.exports.extractConfig = (specificConfigObj, pipelineConfigObj = {}, pluginName = "", defaultConfigObj = {}) => {
+module.exports.extractConfig = (specificConfigObj, pipelineConfigObj = undefined, pluginName = undefined, defaultConfigObj = undefined) => {
     let configObj;
     try {
       let dataObj;
