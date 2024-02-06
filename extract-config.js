@@ -12,26 +12,36 @@ const merge = require('merge');
  * @param pluginName Name to search in pipelineConfigObj for settings, i.e. pipelineConfigObj[pluginName]
  * @param defaultConfigObj A default configObj whose properties are overridden by the others
  */
-module.exports.extractConfig = (specificConfigObj, pipelineConfigObj = undefined, pluginName = undefined, defaultConfigObj = undefined) => {
+module.exports.extractConfig = function (specificConfigObj, pipelineConfigObj = undefined, pluginName = undefined, defaultConfigObj = undefined) {
     let configObj;
     try {
       let dataObj;
-      if (specificConfigObj)
-        dataObj = specificConfigObj
+      if (specificConfigObj) {
+        if (typeof specificConfigObj === 'string')
+          dataObj = JSON.parse(specificConfigObj)
+        else
+          dataObj = specificConfigObj;
+      }
       else if (pipelineConfigObj) {
+        console.log("typeof pipelineConfigObj: ", typeof pipelineConfigObj)
+        if (typeof pipelineConfigObj === 'string')
+          dataObj = JSON.parse(pipelineConfigObj)
+        else
+          dataObj = pipelineConfigObj;
+
         // look for a property based on our plugin's name; assumes a complex object meant for multiple plugins
-        dataObj = pipelineConfigObj[pluginName];
-        // if we didn't find a config above, use the entire pipelineConfigObj object as our config
-        if (!dataObj) dataObj = pipelineConfigObj;
-        // merge superConfigObj config into our passed-in origConfigObj
+        if (dataObj[pluginName])
+          dataObj = dataObj[pluginName];
       }
   
       // merge our chosen dataObj into defaultConfigObj, overriding any conflicting properties in defaultConfigObj
       // merge.recursive(defaultConfigObj, dataObj); // <-- huge bug: can't change parameter objects: changing them affects subsequent plugins in the pipeline
       configObj = merge.recursive(true, defaultConfigObj, dataObj );
     }
-    catch { 
-      // ignore errors
+    catch (err) { 
+      console.error(err)
     }
+
+    console.log("returning configObj: ", configObj)
     return configObj;
   }
