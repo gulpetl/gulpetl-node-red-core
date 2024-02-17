@@ -43,6 +43,6 @@ module.exports.extractConfig = function (specificConfigObj, pipelineConfigObj = 
     console.error(err)
   }
 
-  console.log("returning configObj: ", configObj)
+  // console.log("returning configObj: ", configObj)
   return configObj;
 }

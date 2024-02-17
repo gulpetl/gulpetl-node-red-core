@@ -14,7 +14,7 @@ module.exports = function (RED) {
         node.on('input', function (msg, send, done) {
             let configObj;
             try {
-                if (this.config.trim())
+                if (this?.config?.trim())
                     configObj = JSON.parse(this.config);
             }
             catch (err) {
