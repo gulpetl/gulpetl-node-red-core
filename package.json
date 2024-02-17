@@ -1,6 +1,6 @@
 {
   "name": "@gulpetl/node-red-core",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Core nodes/code for using gulp/gulpetl under Node.RED",
   "main": "extract-config.js",
   "scripts": {
