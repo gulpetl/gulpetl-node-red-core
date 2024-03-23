@@ -24,7 +24,7 @@ module.exports.extractConfig = function (specificConfigObj, pipelineConfigObj = 
         dataObj = specificConfigObj;
     }
     else if (pipelineConfigObj) {
-      console.log("typeof pipelineConfigObj: ", typeof pipelineConfigObj)
+      // console.log("typeof pipelineConfigObj: ", typeof pipelineConfigObj)
       if (typeof pipelineConfigObj === 'string')
         dataObj = JSON.parse(pipelineConfigObj)
       else

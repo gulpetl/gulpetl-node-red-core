@@ -16,6 +16,26 @@ module.exports = function (RED) {
 
                             let filetransform = transform((file) => {
 
+                                if (file.isBuffer()) {
+                                    // send one node-red message for entire file if the file is in buffer mode--regardless of "level" param
+                                    msg = RED.util.cloneMessage(msg);
+                                    msg.payload = file.path;
+                                    msg.gulpfile = file;
+                                    msg.topic = "gulpfile-buffer";
+                                    if (config?.level != "file")
+                                        msg.notice = "Pipe Level overridden to 'msg-per-file' because file is in `buffer` mode";
+                                    send(msg);
+
+                                    return file; 
+                                }
+                                else if (!file.isStream()) {
+                                    // handle file types other than Buffer or Stream (e.g. isNull, isDirectory; see https://gulpjs.com/docs/en/api/vinyl#instance-methods) 
+
+                                    return file; 
+                                }
+
+                                // handle messages for streaming mode only (config contained "buffer":false, results in file.isStream())
+
                                 if (config.level == "line") {
                                     file.upstream = file.contents; // attach this stream to file for backpressure management
                                     file.msgCount = 0;             // counter for Node-RED message backlog

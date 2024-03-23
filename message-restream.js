@@ -15,6 +15,9 @@ module.exports = function (RED) {
 
                         let filetransform = transform((file) => {
 
+                            if (!file.isStream())
+                                return file; // if this file is not a stream, skip everything below and return file as-is
+
                             // set up appender as a "passthrough" stream--it will pass data through unchanged
                             file.appender = transform((line) => {return line});
     
