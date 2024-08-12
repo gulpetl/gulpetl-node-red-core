@@ -44,15 +44,14 @@ module.exports = function (RED) {
 
                             // send an info message to announce the file we're processing
                             let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ${file.basename}`
-                            msg.payload = `gulpfile: ${fileDescription}`;
-                            msg.topic = "gulp-info";
-                            msg.gulpfile = file;
                             // console.log("gulp.dest:", fileDescription)
 
-                            send(msg);
+                            send({...msg, topic:"gulp-info", parts:{id:msg._msgid}, _msgid:"", payload:`gulpfile: ${fileDescription}`,gulpfile:file});
                         })
                         .on("end", () => {
                             this.status({ fill: "green", shape: "ring", text: "ready" });
+
+                            send({...msg, topic:"gulp-finalize", parts:{id:msg._msgid}, _msgid:""});
                         })
 
                     );

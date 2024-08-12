@@ -35,6 +35,7 @@
   "dependencies": {
     "gulp": "^4.0.2",
     "merge": "^2.1.1",
+    "merge-stream": "^2.0.0",
     "stream-combiner": "^0.2.2",
     "stream-transform": "^3.2.10"
   },

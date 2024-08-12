@@ -11,6 +11,9 @@ dependencies:
   merge:
     specifier: ^2.1.1
     version: 2.1.1
+  merge-stream:
+    specifier: ^2.0.0
+    version: 2.0.0
   stream-combiner:
     specifier: ^0.2.2
     version: 0.2.2
@@ -1681,6 +1684,10 @@ packages:
       stack-trace: 0.0.10
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /merge-stream@2.0.0:
+    resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
     dev: false
 
   /merge@2.1.1:
